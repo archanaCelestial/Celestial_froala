@@ -102,16 +102,16 @@
         },
         {
             "name": "froala/wysiwyg-editor",
-            "version": "v4.2.0",
+            "version": "v4.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/froala/wysiwyg-editor.git",
-                "reference": "dff8724091980dbf605a6b81ce0decb10452a377"
+                "reference": "5ed81d0407fb2de70179b3dd18469e6ce8f96a33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/froala/wysiwyg-editor/zipball/dff8724091980dbf605a6b81ce0decb10452a377",
-                "reference": "dff8724091980dbf605a6b81ce0decb10452a377",
+                "url": "https://api.github.com/repos/froala/wysiwyg-editor/zipball/5ed81d0407fb2de70179b3dd18469e6ce8f96a33",
+                "reference": "5ed81d0407fb2de70179b3dd18469e6ce8f96a33",
                 "shasum": ""
             },
             "type": "component",
@@ -144,9 +144,9 @@
             ],
             "support": {
                 "issues": "https://www.froala.com/wysiwyg-editor/contact",
-                "source": "https://github.com/froala/wysiwyg-editor/tree/v4.2.0"
+                "source": "https://github.com/froala/wysiwyg-editor/tree/v4.7.1"
             },
-            "time": "2024-03-21T09:29:16+00:00"
+            "time": "2025-11-19T08:44:01+00:00"
         },
         {
             "name": "froala/wysiwyg-editor-php-sdk",
@@ -211,10 +211,10 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }
