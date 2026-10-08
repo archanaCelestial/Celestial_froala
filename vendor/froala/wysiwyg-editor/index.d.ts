@@ -27,6 +27,7 @@ declare module "froala-editor" {
     align: Align;
     button: Button;
     charCounter: CharCounter;
+    wordCounter: WordCounter;
     clean: Clean;
     codeView: CodeView;
     colors: Colors;
@@ -39,6 +40,7 @@ declare module "froala-editor" {
     emoticons: Emoticons;
     events: Events;
     file: File;
+    findReplace: FindReplace;
     fontFamily: FontFamily;
     fontSize: FontSize;
     format: Format;
@@ -80,6 +82,9 @@ declare module "froala-editor" {
     track_changes: Track_Changes;
     special_characters: Special_characters;
     word_paste: Word_paste;
+    exportToWord: ExportToWord;
+    pageBreak: Page_Break;
+    linkToAnchor: linkToAnchor;
     refresh: Refresh;
     shortcuts: Shortcuts;
     static DefineIcon: (name: string, parameters: Partial<DefineIconParameters>) => object;
@@ -970,6 +975,8 @@ declare module "froala-editor" {
       rejectAllChanges: string,
       acceptSingleChange: string,
       rejectSingleChange: string,
+      bookmark: string,
+      anchor: string,
       [key: string]: string
   }
   
@@ -1118,6 +1125,11 @@ declare module "froala-editor" {
     }[];
   }
 
+  export type LineHeightObj = {
+    label: string;
+    value: number;
+  }
+
   export interface FroalaOptions {
     // apiKey
     apiKey: string;
@@ -1159,6 +1171,10 @@ declare module "froala-editor" {
     // Char Counter
     charCounterCount: boolean;
     charCounterMax: number;
+
+    // Word Counter
+    wordCounterCount: boolean;
+    wordCounterMax: number;
 
     // Code Beautifier
     codeBeautifierOptions: Object;
@@ -1229,6 +1245,7 @@ declare module "froala-editor" {
     key: string;
 
     // General
+    allowStylingOnNonEditable : boolean;
     attribution: boolean;
     autoStart: boolean;
     autofocus: boolean;
@@ -1236,6 +1253,8 @@ declare module "froala-editor" {
     disableRightClick: boolean;
     documentReady: boolean;
     editInPopup: boolean;
+    enableMatchCase: boolean;
+    enableMatchWholeWord: boolean;
     update: void;
     editorClass: string;
     enter: ENTER_BR | ENTER_P | ENTER_DIV;
@@ -1263,6 +1282,7 @@ declare module "froala-editor" {
     initOnClick: boolean;
     keepFormatOnDelete: boolean;
     multiLine: boolean;
+    preserveTabSpaces: boolean;
     pasteAllowLocalImages: boolean;
     pasteAllowedStyleProps: string[];
     pasteDeniedAttrs: string[];
@@ -1270,6 +1290,7 @@ declare module "froala-editor" {
     pastePlain: boolean;
     placeholderText: string;
     pluginsEnabled: string[];
+    pluginsDisabled: string[];
     popupButtons: string[];
     requestHeaders: GenericObject<string>; 
     requestWithCORS: boolean;
@@ -1277,6 +1298,7 @@ declare module "froala-editor" {
     scrollableContainer: string;
     shortcutsEnabled: string[];
     shortcutsHint: boolean;
+    showFindAndReplace: boolean;
     spellcheck: boolean;
     tabIndex: number;
     tabSpaces: number;
@@ -1296,6 +1318,8 @@ declare module "froala-editor" {
     useClasses: boolean;
     width: string;
     zIndex: number;
+    clearFormatOnEnterNewLine: boolean;
+    cleanReduntantStyleOnGet: boolean;
 
     // Help
     helpSets: object[];
@@ -1376,7 +1400,7 @@ declare module "froala-editor" {
     linkText: boolean;
 
     // Paragraph Format
-    lineHeights: GenericObject<string>; 
+    lineHeights: GenericObject<string> | LineHeightObj[];
     paragraphDefaultSelection: string;
     paragraphFormat: GenericObject<string>;
     paragraphFormatSelection: boolean;
@@ -1418,7 +1442,6 @@ declare module "froala-editor" {
     tableColors: string[];
     tableColorsButtons: string[];
     tableColorsStep: number;
-    tableDefaultWidth: string;
     tableEditButtons: string[];
     tableInsertButtons: string[];
     tableInsertHelper: boolean;
@@ -1429,6 +1452,16 @@ declare module "froala-editor" {
     tableResizerOffset: number;
     tableResizingLimit: number;
     tableStyles: GenericObject<string>; 
+    tableDefaultWidth: string,
+    tableDefaultAlign: string,
+    tableDefaultHeight: string,
+    tableDefaultBGColor: string,
+    tableDefaultBorderColor: string,
+    tableDefaultBorderWidth: string,
+    tableDefaultBorderStyle: string,
+    tableBorderStyle: string[],
+    proportionalTableResize: boolean,
+    enableTableSelection: boolean,
 
     // Video
     videoAllowedProviders: string[];
@@ -1458,10 +1491,20 @@ declare module "froala-editor" {
     wordDeniedTags: string[];
     wordPasteKeepFormatting: boolean;
     wordPasteModal: boolean;
+    wordExportFileName: string;
 
     showChangesEnabled: boolean;
     trackChangesEnabled: boolean;
     [key: string]: any;
+
+    // Filestack
+    filestackOptions: object;
+
+    //page break
+    exportPageBreak: boolean;
+
+    //link to anchor
+    anchorEditButtons: string[];
   }
 
   export interface FroalaEvents {
@@ -1486,8 +1529,16 @@ declare module "froala-editor" {
     //character count event
     'charCounter.exceeded': (this: FroalaEditor) => void;
     'charCounter.update': (this: FroalaEditor) => void;
+    //word count event
+    'wordCounter.exceeded': (this: FroalaEditor) => void;
+    'wordCounter.update': (this: FroalaEditor) => void;
     //code view event
     'codeView.update': (this: FroalaEditor) => void;
+    //find and replace event
+    'findandreplace.onReplaceAll': (this: FroalaEditor, replacements: Array<{ oldValue: string, newValue: string }>) => void;
+    'findandreplace.onReplace': (this: FroalaEditor, oldValue: string, newValue: string) => void;
+    'findandreplace.beforeClose': (this: FroalaEditor) => boolean;
+    'findandreplace.beforeOnReplace': (this: FroalaEditor) => boolean;
     //commands event
     'commands.after': (this: FroalaEditor, cmd: any, param1?: any, param2?: any) => void;
     'commands.before': (this: FroalaEditor, cmd: any, param1?: any, param2?: any) => void;
@@ -1514,7 +1565,10 @@ declare module "froala-editor" {
     'image.resizeEnd': (this: FroalaEditor, img: object) => void;
     'image.uploaded': (this: FroalaEditor, response: any) => boolean;
     'image.uploadedToS3': (this: FroalaEditor, link: URL, key: string, response: any) => void;
-    'image.uploadedToFilestack': (this: FroalaEditor, response: any) => boolean;
+    'filestack.uploadedToFilestack': (this: FroalaEditor, response: any) => boolean;
+    'filestack.uploadFailedToFilestack': (this: FroalaEditor, response: any) => boolean;
+    'filestack.filestackPickerClosed': (this: FroalaEditor, response: any) => boolean;
+    'filestack.filestackPickerOpened': (this: FroalaEditor, response: any) => boolean;
     //imagemanager event
     'imageManager.beforeDeleteImage': (this: FroalaEditor, img: object) => void;
     'imageManager.error': (this: FroalaEditor, error: object, response: any) => void;
@@ -1528,7 +1582,7 @@ declare module "froala-editor" {
     //paste event
     'paste.after': (this: FroalaEditor) => void;
     'paste.afterCleanup': (this: FroalaEditor, clipboard_html: string) => void;
-    'paste.before': (this: FroalaEditor, original_event: any) => boolean;
+    'paste.before': (this: FroalaEditor, original_event: any, clipboard_data?: any) => boolean;
     'paste.beforeCleanup': (this: FroalaEditor, clipboard_html: string) => void;
     'paste.wordPaste': (this: FroalaEditor, clipboard_html: string) => void;
     // popups events
@@ -1590,7 +1644,17 @@ declare module "froala-editor" {
     'edit.off': (this: FroalaEditor) => void;
     //element event
     'element.dropped': (this: FroalaEditor, element: object) => void;
+    'cell.replaced': (this: FroalaEditor, oldCell: any, newCell: any) => void;
     [key: string]: (this:FroalaEditor, ...args: any[]) => any;
+    //export event
+    'word.beforeExport': (this: FroalaEditor, html: string) => string;
+    'word.afterExport': (this: FroalaEditor, html: string) => void;
+    //page break
+    'pageBreak.beforeInsert': (this: FroalaEditor) => boolean;
+
+    // link to anchor
+    'anchor.beforeInsert': (this: FroalaEditor, link: string, text: string) => boolean;
+    'anchor.beforeRemove': (this: FroalaEditor, link: string) => boolean;
   }
 
   export interface FilesManager {
@@ -1676,6 +1740,13 @@ declare module "froala-editor" {
     _init(): boolean;
     // Returns the number of characters in the editor.
     count(): number;
+  }
+
+  export interface WordCounter {
+    _init(): boolean;
+    // Returns the number of words in the editor.
+    wordCount(): number;
+    [key: string]: (...args: any[]) => any;
   }
 
   interface Apply<T> {
@@ -1910,6 +1981,20 @@ declare module "froala-editor" {
     [key: string]: (...args: any[]) => any;
   }
 
+  export interface FindReplace {
+    findMatch(fullText: string, regex: RegExp): RegExpExecArray | null;
+    findMatches(searchText: string): void;
+    findNextMatch(index: number): void;
+    findPreviousMatch(index: number): void;
+    replaceMatch(replaceText: string): void;
+    replaceMatches(replaceText: string): void;
+    getMatchesCount(): number;
+    getCurrentMatch(): object;
+    getCurrentMatchIndex(): number;
+    showPopup(): void;
+    hidePopup(): void;
+  }
+
   export interface FontFamily {
     apply(value: string): object | void;
     refreshOnShow($btn: any, $dropdown: any): void;
@@ -1987,6 +2072,8 @@ declare module "froala-editor" {
     isURL(url: string): boolean;
     getAlignment($block: any): any;
     isInViewPort(el: any): boolean;
+    isRGBColor(val: any): void;
+    isValidHexColor(val: any): void;
   }
 
   export interface HTML {
@@ -2062,11 +2149,13 @@ declare module "froala-editor" {
     insert(href: string, text: string, attributes?: { [key: string]: any }): object;
     remove(): object;
     showInsertPopup(): void;
-    usePredefined(val: any): void;
+    usePredefined(val: any, data: any): void;
     insertCallback(): void;
     update(): void;
     back(): void;
     imageLink(): void;
+    getAllAnchorList(): HTMLElement | void;
+    scrollToAnchor(href: HTMLElement): boolean;
     [key: string]: (...args: any[]) => any;
   }
 
@@ -2209,7 +2298,7 @@ declare module "froala-editor" {
   }
 
   export interface FroalaSelection {
-    blocks(toggleList?: any): any[];
+    blocks(toggleList?: any, keepLi?: any): any[];
     clear(): void;
     element(): HTMLElement;
     endElement(): Element;
@@ -2277,6 +2366,12 @@ declare module "froala-editor" {
     selectedCells(): void;
     customColor(): void;
     selectCells(firstCell: any, lastCell: any): void;
+    showTableProperties(): void;
+    hideTableProperties(): void;
+    updateTableAlign(val: string): void;
+    showCellPropertiesPopup(): void;
+    updateSelectedColor(val: any): void;
+    placeCursorInFirstCell(val: any): void;
     [key: string]: (...args: any[]) => any;
   }
 
@@ -2402,5 +2497,25 @@ declare module "froala-editor" {
     exec: (e: any, $tb: any) => boolean;
     saveSelection: () => void;
     restoreSelection: () => void;
+  }
+
+  export interface ExportToWord{
+    export(): void
+  }
+
+  export interface Page_Break{
+    _init(): boolean;
+    insert(element?: HTMLElement): boolean | void;
+    remove(): void;
+  }
+
+  export interface linkToAnchor{
+    _init(): boolean;
+    insert(): void;
+    update(link: HTMLElement): void;
+    remove(link: HTMLElement): void;
+    showPopup(): void;
+    closeAnchorInsert(): void;
+    focusOnAnchor(anchor: HTMLElement): boolean | void;
   }
 }
