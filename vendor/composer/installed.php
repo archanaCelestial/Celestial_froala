@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'froala/wysiwyg-editor-php-sdk-example',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'ed1ee1f7309c8580ef25c34ad45454b415ba8ec7',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'components/jquery' => array(
-            'pretty_version' => 'v3.7.1',
-            'version' => '3.7.1.0',
-            'reference' => '8edc7785239bb8c2ad2b83302b856a1d61de60e7',
+            'pretty_version' => '4.0.0',
+            'version' => '4.0.0.0',
+            'reference' => '594f9dd922c3b12519c8d52bde744b79fd2ca816',
             'type' => 'component',
             'install_path' => __DIR__ . '/../components/jquery',
             'aliases' => array(),
@@ -47,9 +47,9 @@
             'dev_requirement' => false,
         ),
         'froala/wysiwyg-editor-php-sdk-example' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'ed1ee1f7309c8580ef25c34ad45454b415ba8ec7',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
